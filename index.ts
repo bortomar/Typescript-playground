@@ -33,7 +33,11 @@ function check(x: number = 1, a: any, b?: number): (boolean[] | never) {
     throw new Error('xxx');
 }
 
-//check(undefined, '4', 1)
+try {
+    check(undefined, '4', 1)
+} catch (e) {
+    console.error(e)
+}
 
 class Bar {
     n: number;
