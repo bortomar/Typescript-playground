@@ -41,7 +41,7 @@ try {
 
 class Bar {
     n: number;
-    constructor(h: number, public x: string) {
+    constructor(h: number, public readonly x: string) {
         this.n = h;
         //this.x = x;
     }
