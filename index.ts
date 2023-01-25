@@ -49,6 +49,7 @@ class Bar {
         console.log(`hello ${this.n}`)
 
     }
+    get name(): string { return 'jmeno' }
 }
 
 function Foo(this: any, h: number) {
@@ -62,7 +63,28 @@ fb.hello()
 console.log(Bar.prototype.hello)
 
 const b = new Bar(1, '5');
-console.log(b.x)
+//console.log(b.x)
+
+function toJSON(obj: object) {
+    const props = Object.entries(
+        Object.getOwnPropertyDescriptors(obj)
+    );
+    const methods = Object.entries(
+        Object.getOwnPropertyDescriptors(
+            Object.getPrototypeOf(obj)
+        )
+    )
+
+    return {
+        ...props.reduce((o, [k, v]) => ({...o, [k]: v.value}), {}),
+        ...methods.reduce((o, [k, v]) => {
+            return !!v.get ? { ...o, [k]: v.get() } : o;
+        }, {})
+    }
+    
+}
+
+console.log(toJSON(b))
 // To learn more about the language, click above in "Examples" or "What's New".
 // Otherwise, get started by removing these comments and the world is your playground.
   
