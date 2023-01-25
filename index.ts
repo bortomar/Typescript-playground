@@ -77,11 +77,18 @@ function toJSON(obj: object) {
 
     return {
         ...props.reduce((o, [k, v]) => ({
-            ...o, [k]: v.value
+            ...o, 
+            ...(
+                v.hasOwnProperty('value') 
+                && { [k]: v.value }
+            )
         }), {}),
         ...methods.reduce((o, [k, v]) => ({ 
             ...o, 
-            ...(!!v.get && { [k]: v.get() }) 
+            ...(
+                !!v.get 
+                && { [k]: v.get() }
+            ) 
         }), {})
     }
     
