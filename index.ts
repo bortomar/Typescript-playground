@@ -151,10 +151,13 @@ class LayerStyle {
   set radius(v: number) {
       this.style.radius = v - 1;
   }
+  toJSON(fn: Function) {
+      return fn(this.style)
+  }
 }
 const ls = new LayerStyle({ opacity: 1, radius: 5 });
 ls.line_width = 9;
 console.log(ls.line_width);
 ls.point_size = 11
 console.log(ls.point_size);
-console.log(toJSON(ls))
+console.log(ls.toJSON(toJSON))
