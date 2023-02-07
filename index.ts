@@ -7,94 +7,146 @@
 //  - A place to experiment with TypeScript syntax, and share the URLs with others
 //  - A sandbox to experiment with different compiler features of TypeScript
 
-
-
-function test(a:number, b: number): number {
-    return a + b;
+function test(a: number, b: number): number {
+  return a + b;
 }
 
 test(3, 4);
 
 let foo: {
-    bar: number
+  bar: number;
 };
 
 foo = {
-    //foo: 4,
-    bar: NaN
+  //foo: 4,
+  bar: NaN,
 };
 
-let a: (number | null)[] = [ 1, 2, null, 3];
+let a: (number | null)[] = [1, 2, null, 3];
 
-function check(x: number = 1, a: any, b?: number): (boolean[] | never) {
-    if (typeof a === 'number' || x > 5) {
-        return [true];
-    }
-    throw new Error('xxx');
+function check(x: number = 1, a: any, b?: number): boolean[] | never {
+  if (typeof a === 'number' || x > 5) {
+    return [true];
+  }
+  throw new Error('xxx');
 }
 
 try {
-    check(undefined, '4', 1)
+  check(undefined, '4', 1);
 } catch (e) {
-    console.error(e)
+  console.error(e);
 }
 
 class Bar {
-    n: number;
-    constructor(h: number, public readonly x: string) {
-        this.n = h;
-        //this.x = x;
-    }
-    hello(): void {
-        console.log(`hello ${this.n}`)
-
-    }
-    get name(): string { return 'jmeno' }
+  n: number;
+  constructor(h: number, public readonly x: string) {
+    this.n = h;
+    //this.x = x;
+  }
+  hello(): void {
+    console.log(`hello ${this.n}`);
+  }
+  get name(): string {
+    return 'jmeno';
+  }
 }
 
 function Foo(this: any, h: number) {
-    this.n = h;
-    this.hello  = (): void => console.log(`hello ${this.n}`)
+  this.n = h;
+  this.hello = (): void => console.log(`hello ${this.n}`);
 }
 
 const fb = new (Foo as any)(2);
-fb.hello()
+fb.hello();
 
-console.log(Bar.prototype.hello)
+console.log(Bar.prototype.hello);
 
 const b = new Bar(1, '5');
 //console.log(b.x)
 
 function toJSON(obj: object) {
-    const props = Object.entries(
-        Object.getOwnPropertyDescriptors(obj)
-    );
-    const methods = Object.entries(
-        Object.getOwnPropertyDescriptors(
-            Object.getPrototypeOf(obj)
-        )
-    )
+  const props = Object.entries(Object.getOwnPropertyDescriptors(obj));
+  const methods = Object.entries(
+    Object.getOwnPropertyDescriptors(Object.getPrototypeOf(obj))
+  );
 
-    return {
-        ...props.reduce((o, [k, v]) => ({
-            ...o, 
-            ...(
-                v.hasOwnProperty('value') 
-                && { [k]: v.value }
-            )
-        }), {}),
-        ...methods.reduce((o, [k, v]) => ({ 
-            ...o, 
-            ...(
-                !!v.get 
-                && { [k]: v.get() }
-            ) 
-        }), {})
-    }
-    
+  return {
+    ...props.reduce(
+      (o, [k, v]) => ({
+        ...o,
+        ...(v.hasOwnProperty('value') && { [k]: v.value }),
+      }),
+      {}
+    ),
+    ...methods.reduce(
+      (o, [k, v]) => ({
+        ...o,
+        ...(!!v.get && { [k]: v.get() }),
+      }),
+      {}
+    ),
+  };
 }
 
-console.log(toJSON(b))
+console.log(toJSON(b));
 // To learn more about the language, click above in "Examples" or "What's New".
 // Otherwise, get started by removing these comments and the world is your playground.
-  
+
+export type TLayerStyle = {
+  opacity: number;
+  point_cloud_square?: boolean;
+  point_size?: number;
+  point_size_min?: number;
+  point_size_max?: number;
+  radius?: number;
+  filled?: boolean;
+  fill_color?: string;
+  line_width?: number;
+  stroked?: boolean;
+  line_color?: string;
+};
+
+class LayerStyle {
+  [x: string]: any;
+  private style = {
+    opacity: 1,
+    radius: 1,
+    point_cloud_square: false,
+    point_size: 1,
+    point_size_min: 0.1,
+    point_size_max: 10,
+    filled: false,
+    fill_color: '#000000ff',
+    line_width: 100,
+    stroked: false,
+    line_color: '#000000ff',
+  };
+
+  constructor(style: TLayerStyle) {
+    Object.assign(this.style, style);
+    for (let k in this.style) {
+      const setter = Object.getOwnPropertyDescriptor(
+        LayerStyle.prototype,
+        k
+      )?.set?.bind(this);
+      Object.defineProperty(this, k, {
+        get: () => {
+          return this.style[k as keyof TLayerStyle];
+        },
+        set: setter
+          ? setter
+          : <K extends keyof TLayerStyle>(value: any) => {
+              this.style[k as K] = value;
+            },
+      });
+    }
+  }
+
+  set line_width(v: number) {
+    this.style.line_width = v * 2;
+  }
+}
+const ls = new LayerStyle({ opacity: 1, radius: 5 });
+ls.line_width = 9;
+console.log(ls.line_width);
+console.log(ls.radius);
