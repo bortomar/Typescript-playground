@@ -123,41 +123,42 @@ class LayerStyle {
   };
 
   constructor(style: TLayerStyle) {
-    //Object.assign(this.style, style);
     for (let k in this.style) {
-      const setter = Object.getOwnPropertyDescriptor(
-        LayerStyle.prototype,
-        k
-      )?.set?.bind(this);
+      const desc = Object.getOwnPropertyDescriptor(LayerStyle.prototype, k);
+      const getter = desc?.get?.bind(this);
+      const setter = desc?.set?.bind(this);
       Object.defineProperty(this, k, {
-        get: () => {
-          return this.style[k as keyof TLayerStyle];
-        },
-        set: setter
-          ? setter
-          : <K extends keyof TLayerStyle>(value: any) => {
-              this.style[k as K] = value;
-            },
+        get:
+          getter ??
+          (() => {
+            return this.style[k as keyof TLayerStyle];
+          }),
+        set:
+          setter ??
+          (<K extends keyof TLayerStyle>(value: any) => {
+            this.style[k as K] = value;
+          }),
       });
     }
-    Object.keys(style).forEach(k => {
-        this[k] = style[k as keyof TLayerStyle]
-    })
+    Object.keys(style).forEach((k) => {
+      this[k] = style[k as keyof TLayerStyle];
+    });
   }
 
   set line_width(v: number) {
     this.style.line_width = v * 2;
   }
   set radius(v: number) {
-      this.style.radius = v - 1;
+    this.style.radius = v - 1;
   }
   toJSON(fn: Function) {
-      return fn(this.style)
+    return fn(this.style);
   }
 }
 const ls = new LayerStyle({ opacity: 1, radius: 5 });
 ls.line_width = 9;
 console.log(ls.line_width);
-ls.point_size = 11
+ls.point_size = 11;
 console.log(ls.point_size);
-console.log(ls.toJSON(toJSON))
+ls.mukl = 1
+console.log(ls.toJSON(toJSON));
