@@ -123,7 +123,7 @@ class LayerStyle {
   };
 
   constructor(style: TLayerStyle) {
-    Object.assign(this.style, style);
+    //Object.assign(this.style, style);
     for (let k in this.style) {
       const setter = Object.getOwnPropertyDescriptor(
         LayerStyle.prototype,
@@ -140,13 +140,21 @@ class LayerStyle {
             },
       });
     }
+    Object.keys(style).forEach(k => {
+        this[k] = style[k as keyof TLayerStyle]
+    })
   }
 
   set line_width(v: number) {
     this.style.line_width = v * 2;
   }
+  set radius(v: number) {
+      this.style.radius = v - 1;
+  }
 }
 const ls = new LayerStyle({ opacity: 1, radius: 5 });
 ls.line_width = 9;
 console.log(ls.line_width);
-console.log(ls.radius);
+ls.point_size = 11
+console.log(ls.point_size);
+console.log(toJSON(ls))
