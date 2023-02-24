@@ -74,14 +74,18 @@ function toJSON(obj: object) {
     ...props.reduce(
       (o, [k, v]) => ({
         ...o,
-        ...(v.hasOwnProperty('value') && { [k]: v.value }),
+        // ...(v.hasOwnProperty('value') && { [k]: v.value }),
+        ...(typeof v.value !== 'function' && {
+          [k.replace(/^_?(.+)/g, '$1')]: v.value,
+        }),
       }),
       {}
     ),
     ...methods.reduce(
       (o, [k, v]) => ({
         ...o,
-        ...(!!v.get && { [k]: v.get() }),
+        // ...(!!v.get && { [k]: v.get() }),
+        ...(!!v.get && { [k]: obj[k as keyof typeof obj] }),
       }),
       {}
     ),
@@ -160,5 +164,5 @@ ls.line_width = 9;
 console.log(ls.line_width);
 ls.point_size = 11;
 console.log(ls.point_size);
-ls.mukl = 1
+ls.mukl = 1;
 console.log(ls.toJSON(toJSON));
